@@ -14,3 +14,7 @@ libraryDependencies ++= Seq(
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
+
+libraryDependencies += "org.seleniumhq.selenium" % "selenium-java" % "2.53.0"
+
+libraryDependencies += "commons-codec" % "commons-codec" % "1.10"
