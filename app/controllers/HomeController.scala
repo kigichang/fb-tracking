@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 import play.api._
 import play.api.mvc._
+import services.config
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -20,8 +21,8 @@ class HomeController @Inject() extends Controller {
    * a path of `/`.
    */
   def index = Action {
-    log.debug(s"facebook account ${config.getString("facebook.account")}")
-    log.debug(s"facebook password ${config.getString("facebook.password")}")
+    //log.debug(s"facebook account ${config.getString("facebook.account")}")
+    //log.debug(s"facebook password ${config.getString("facebook.password")}")
     log.debug(s"facebook appid ${config.getString("facebook.appid")}")
     log.debug(s"facebook secret ${config.getString("facebook.secret")}")
     Ok(views.html.index("Your new application is ready."))
