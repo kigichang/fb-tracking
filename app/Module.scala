@@ -1,6 +1,8 @@
 import com.google.inject.AbstractModule
 import java.time.Clock
 
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.chrome.ChromeDriver
 import services.{ApplicationTimer, AtomicCounter, Counter}
 import services.facebook.Facebook
 
@@ -26,6 +28,8 @@ class Module extends AbstractModule {
     bind(classOf[Counter]).to(classOf[AtomicCounter])
 
     bind(classOf[Facebook]).asEagerSingleton()
+
+    bind(classOf[WebDriver]).to(classOf[ChromeDriver])
   }
 
 }

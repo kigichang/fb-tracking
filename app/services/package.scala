@@ -6,4 +6,6 @@ import com.typesafe.config.ConfigFactory
 package object services {
 
   val config = ConfigFactory.load
+
+
 }

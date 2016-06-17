@@ -1,15 +1,15 @@
 package services.facebook
 
-import java.net.URLEncoder
 import javax.inject._
 
 import play.api.Logger
-import play.api.libs.json.JsSuccess
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, Request}
 
+import scala.concurrent.Future
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration.DurationInt
 
 /**
@@ -46,7 +46,7 @@ class Facebook @Inject() (ws: WSClient) {
 
   def getAccessToken(code: String): Option[String] = {
     log.debug(s"redirect_uri: $redirectURI")
-    val resp = ws.url(s"$graphURL/$version/oauth/access_token")
+    val resp = ws.url(s"$GraphURL/$version/oauth/access_token")
                 .withQueryString(
                   "client_id" -> appId,
                   "client_secret" -> secret,
@@ -71,7 +71,7 @@ class Facebook @Inject() (ws: WSClient) {
   def getAccessToken(req: Request[AnyContent]): Option[String] = req.getQueryString("code") flatMap { code => getAccessToken(code) }
 
   def getLongAccessToken(): Option[String] = {
-    val resp = ws.url(s"$graphURL/$version/oauth/access_token")
+    val resp = ws.url(s"$GraphURL/$version/oauth/access_token")
                   .withQueryString(
                     "grant_type" -> "fb_exchange_token",
                     "client_id" -> appId,
@@ -93,4 +93,22 @@ class Facebook @Inject() (ws: WSClient) {
     Await.result(result, 10 seconds)
   }
 
+  def validate[T](json: JsValue)(implicit rds: Reads[T]): Either[JsValue, T] = json.validate[T] match {
+    case result: JsSuccess[T] => Right(result.get)
+    case error: JsError => Left(json)
+  }
+
+
+  def get[T](url: String, parameters: (String, String)*)(implicit rds:Reads[T]): Future[Either[JsValue, T]] = ws.url(url)
+    .withFollowRedirects(true)
+    .withRequestTimeout(10 seconds)
+    .withQueryString(parameters: _*)
+    .withQueryString("access_token" -> token)
+    .get map { resp => validate[T](resp.json) }
+
+  def page(id: String): Future[Either[JsValue, Page]] = get[Page](s"$GraphURL/$version/$id$PageFields")
+
+  def picture(id: String) = {
+    get[Picture](s"$GraphURL/$version/$id$PageFields")
+  }
 }

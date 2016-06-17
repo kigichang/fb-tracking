@@ -1,0 +1,29 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Facebook 粉絲頁</title>
+</head>
+<body>
+請輸入 Facebook 粉絲頁連結
+<form>
+    https://www.facebook.com/<input type='text' name='name' id='name' value='' /> <input type='button' value='OK' onclick='go()' />
+</form>
+<script>
+function go() {
+ window.open('/fb/' + document.getElementById('name').value);
+}
+</script>
+<p>
+    <br /><a href='/fb/gohappyFANS' target='_blank'>GoHappy 粉絲頁</a>
+    <br /><a href='/fb/fridayshoppingfan' target='_blank'>Friday 粉絲頁</a>
+    <br /><a href='/fb/kerinaFB' target='_blank'>Kerina* 薛妞妞</a>
+    <br /><a href='/fb/LoVeHannahLoVe' target='_blank'>漢娜妞Fashion blog by Hannah Yang</a>
+    <br /><a href='/fb/Littlestrawberryy' target='_blank'>LSBerry's Little World by Berry Weng</a>
+    <br /><a href='/fb/HelloIamLea' target='_blank'>你好Ü 我是圈圈⋈</a>
+</p>
+<p>
+    <br /><a href='/fb/dialog' target='_blank'>Get Token</a>
+    <br /><a href='/fb/debug' target='_blank'>Token Info</a>
+</p>
+</body>
+</html>
