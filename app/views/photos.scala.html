@@ -1,0 +1,37 @@
+@import org.apache.commons.codec.binary.Base64
+@import services.facebook._
+@(photos: Photos)
+<html>
+<head>
+    <meta charset="utf-8" />
+</head>
+<body>
+@for(photo <- photos.data) {
+<div style='border:1px solid #CCC; margin-top:1em'>
+    <ul>
+        <li>id: @photo.id</li>
+        <li>created: @photo.created_time</li>
+        <li>updated: @photo.updated_time</li>
+        <li>picture: <img src="@photo.picture" /></li>
+        <li>images:
+            <ul>
+                @for(image <- photo.images) {
+                <li><img src='@image.source' width='@image.width' height='@image.height' /></li>
+                }
+            </ul>
+        </li>
+    </ul></div>
+}
+
+@for(paging <- photos.paging) {
+
+@for(next <- paging.next) {
+<br /><a href='/fb/photos/next/@{Base64.encodeBase64URLSafeString(next.getBytes("UTF-8"))}'>next</a>
+}
+
+@for(prev <- paging.previous) {
+<br /><a href='/fb/photos/next/@{Base64.encodeBase64URLSafeString(prev.getBytes("UTF-8"))}'>prev</a>
+}
+}
+</body>
+</html>

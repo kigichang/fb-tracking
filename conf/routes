@@ -13,6 +13,10 @@ GET /fb                             controllers.FacebookController.input
 GET /fb/dialog                      controllers.FacebookController.dialog
 GET /fb/code                        controllers.FacebookController.code(code: String)
 GET /fb/:name                       controllers.FacebookController.page(name: String)
+GET /fb/:id/albums                  controllers.FacebookController.albums(id: String)
+GET /fb/albums/next/:url            controllers.FacebookController.albumsNext(url: String)
+GET /fb/:id/photos                  controllers.FacebookController.photos(id: String)
+GET /fb/photos/next/:url            controllers.FacebookController.photosNext(url: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

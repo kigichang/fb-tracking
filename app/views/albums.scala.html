@@ -1,0 +1,38 @@
+@import org.apache.commons.codec.binary.Base64
+@import services.facebook._
+@(albums: Albums)
+<html>
+<head>
+    <meta charset="utf-8" />
+</head>
+<body>
+@for(album <- albums.data) {
+@if(album.count > 0) {
+<div style='border:1px solid #CCC;margin-top:1em'><ul>
+
+    <li>id: <a href="/fb/@album.id/photos" target='_blank'>@album.id</a></li>
+    <li>name: @album.name</li>
+    <li>link: <a href="@album.link" target='_blank'>@album.link</a></li>
+    <li>count: @album.count</li>
+    <li>cover: <img src="@album.picture.data.url" /></li>
+    <li>type: @album.`type`</li>
+    <li>created: @album.created_time</li>
+    <li>updated: @album.updated_time</li>
+    <li>description: @album.description.getOrElse("")</li>
+</ul></div>
+
+}
+}
+
+@for(paging <- albums.paging) {
+
+@for(next <- paging.next) {
+<br /><a href='/fb/albums/next/@{Base64.encodeBase64URLSafeString(next.getBytes("UTF-8"))}'>next</a>
+}
+
+@for(prev <- paging.previous) {
+<br /><a href='/fb/albums/next/@{Base64.encodeBase64URLSafeString(prev.getBytes("UTF-8"))}'>prev</a>
+}
+}
+</body>
+</html>

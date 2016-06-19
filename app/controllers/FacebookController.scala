@@ -2,12 +2,15 @@ package controllers
 
 import javax.inject.{Inject, Singleton}
 
+import org.apache.commons.codec.binary.Base64
 import play.api.Logger
 import play.api.mvc.{Action, Controller}
-import services.facebook.Facebook
+import services.facebook._
 import services.config
 import org.openqa.selenium._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
+import scala.concurrent.Future
 
 /**
   * Created by kigi on 6/15/16.
@@ -37,20 +40,53 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
   }
 
 
-  def code(code: String) = Action { implicit request =>
+  def code(code: String) = Action.async {
 
-    val longCode = for {
-      code <- fb.getAccessToken(request);
+    val tt: Future[Option[String]] = for (
+      code1 <- fb.getAccessToken(code);
       code2 <- fb.getLongAccessToken()
-    } yield code2
+    ) yield code2
 
-    Ok(longCode.getOrElse("token error"))
+    tt map { opt => opt match {
+      case Some(ret) => Ok(ret)
+      case None => Ok("token error")
+    }
+    }
+
   }
 
   def page(name: String) = Action.async {
-    fb.page(name).map {
-      case Right(page) => Ok(page.toString)
-      case Left(error) => Ok(error.toString())
+    fb.page(name) map {
+      case Right(page) => Ok(views.html.page(page))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def albums(id: String) = Action.async {
+    fb.albums(id) map {
+      case Right(albums) => Ok(views.html.albums(albums))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def albumsNext(url: String) = Action.async {
+    fb.paging[Albums](new String(Base64.decodeBase64(url), "UTF-8")) map {
+      case Right(albums) => Ok(views.html.albums(albums))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def photos(id: String) = Action.async {
+    fb.photos(id: String) map {
+      case Right(photos) => Ok(views.html.photos(photos))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def photosNext(url: String) = Action.async {
+    fb.paging[Photos](new String(Base64.decodeBase64(url), "UTF-8")) map {
+      case Right(photos) => Ok(views.html.photos(photos))
+      case Left(error) => Ok(error.toString)
     }
   }
 }

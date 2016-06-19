@@ -4,12 +4,13 @@ import javax.inject._
 
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.mvc.{AnyContent, Request}
 
 import scala.concurrent.Future
 import scala.concurrent.Await
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
 import scala.concurrent.duration.DurationInt
 
 /**
@@ -19,7 +20,7 @@ import scala.concurrent.duration.DurationInt
 class Facebook @Inject() (ws: WSClient) {
   val log = Logger
 
-  import services.config
+  import services._
 
   private var longTermAccessToken = ""
 
@@ -44,71 +45,67 @@ class Facebook @Inject() (ws: WSClient) {
     s"https://www.facebook.com/$version/dialog/oauth?client_id=$appId&redirect_uri=$uri"
   }
 
-  def getAccessToken(code: String): Option[String] = {
+  def getAccessToken(code: String): Future[Option[String]] = {
     log.debug(s"redirect_uri: $redirectURI")
-    val resp = ws.url(s"$GraphURL/$version/oauth/access_token")
-                .withQueryString(
-                  "client_id" -> appId,
-                  "client_secret" -> secret,
-                  "redirect_uri" -> redirectURI,
-                  "code" -> code,
-                  "scope" -> "email,user_birthday,read_stream,publish_stream,offline_access,create_event,rsvp_event"
-                ).get()
 
-    val result = resp map { response =>
-      log.debug(response.body)
-      response.json.validate[Token] match {
-        case t: JsSuccess[Token] =>
-          val token = t.get
-          log.debug(s"short get : ${token.access_token}")
+    val resp: Future[WSResponse] = call(ws, s"$GraphURL/$version/oauth/access_token",
+      "client_id" -> appId,
+      "client_secret" -> secret,
+      "redirect_uri" -> redirectURI,
+      "code" -> code,
+      "scope" -> "email,user_birthday,read_stream,publish_stream,offline_access,create_event,rsvp_event")
+
+    resp map { response =>
+      validate[Token](response.json) match {
+        case Right(token) =>
           shortToken(token.access_token)
           Some(token.access_token)
-        case _ => None
-      } }
-    Await.result(result, 10 seconds)
+        case Left(error) => None
+      }
+    }
   }
 
-  def getAccessToken(req: Request[AnyContent]): Option[String] = req.getQueryString("code") flatMap { code => getAccessToken(code) }
+  //def getAccessToken(req: Request[AnyContent]) = req.getQueryString("code"). flatMap { code => getAccessToken(code) }
 
-  def getLongAccessToken(): Option[String] = {
-    val resp = ws.url(s"$GraphURL/$version/oauth/access_token")
-                  .withQueryString(
-                    "grant_type" -> "fb_exchange_token",
-                    "client_id" -> appId,
-                    "client_secret" -> secret,
-                    "fb_exchange_token" -> accessToken
-                  ).get
+  def getLongAccessToken(): Future[Option[String]] = {
 
-    val result = resp map { response =>
-      log.debug(response.body)
-      response.json.validate[Token] match {
-      case t:JsSuccess[Token] =>
-        val token = t.get
-        log.debug(s"long get: ${token.access_token}")
-        longToken(token.access_token)
-        Some(token.access_token)
-      case _ => None
-    }}
+    val resp = call(ws, s"$GraphURL/$version/oauth/access_token",
+      "grant_type" -> "fb_exchange_token",
+      "client_id" -> appId,
+      "client_secret" -> secret,
+      "fb_exchange_token" -> accessToken)
 
-    Await.result(result, 10 seconds)
+    resp map { response =>
+      validate[Token](response.json) match {
+        case Right(token) =>
+          longToken(token.access_token)
+          Some(token.access_token)
+        case Left(error) => None
+      }
+    }
   }
 
-  def validate[T](json: JsValue)(implicit rds: Reads[T]): Either[JsValue, T] = json.validate[T] match {
-    case result: JsSuccess[T] => Right(result.get)
-    case error: JsError => Left(json)
-  }
+  def get0(url: String, parameters: (String, String)*): Future[WSResponse] =
+    call(ws, url, (("access_token", token) +: parameters): _*)
+
+  def get[T](url: String, parameters: (String, String)*)(implicit rds: Reads[T]): Future[Either[JsError, T]] =
+    get0(url, parameters: _*) map { response => validate[T](response.json)(rds) }
 
 
-  def get[T](url: String, parameters: (String, String)*)(implicit rds:Reads[T]): Future[Either[JsValue, T]] = ws.url(url)
-    .withFollowRedirects(true)
-    .withRequestTimeout(10 seconds)
-    .withQueryString(parameters: _*)
-    .withQueryString("access_token" -> token)
-    .get map { resp => validate[T](resp.json) }
+  def page(id: String): Future[Either[JsError, Page]] = get[Page](s"$GraphURL/$version/$id?$PageFields")
 
-  def page(id: String): Future[Either[JsValue, Page]] = get[Page](s"$GraphURL/$version/$id$PageFields")
+  def picture(id: String): Future[Either[JsError, Picture]] =
+    get[Picture](s"$GraphURL/$version/$id/picture", "redirect" -> "false", "type" -> "large")
 
-  def picture(id: String) = {
-    get[Picture](s"$GraphURL/$version/$id$PageFields")
-  }
+
+  def albums(id: String): Future[Either[JsError, Albums]] =
+    get[Albums](s"$GraphURL/$version/$id/albums?$AlbumsFields")
+
+  def paging[T](url: String)(implicit rds: Reads[T]): Future[Either[JsError, T]] = call(ws, url) map { resp => validate[T](resp.json) }
+
+  //def albumsWithURL(url: String): Future[Either[JsError, Albums]] = paging[Albums](url)
+
+
+  def photos(id: String): Future[Either[JsError, Photos]] =
+    get[Photos](s"$GraphURL/$version/$id/photos?$PhotosFields")
 }
