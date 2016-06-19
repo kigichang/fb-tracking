@@ -15,7 +15,7 @@
     <li>link: <a href="@album.link" target='_blank'>@album.link</a></li>
     <li>count: @album.count</li>
     <li>cover: <img src="@album.picture.data.url" /></li>
-    <li>type: @album.`type`</li>
+    <li>type: @(album.`type`)</li>
     <li>created: @album.created_time</li>
     <li>updated: @album.updated_time</li>
     <li>description: @album.description.getOrElse("")</li>

@@ -10,6 +10,7 @@
 <div style='border:1px solid #CCC; margin-top:1em'>
     <ul>
         <li>id: @photo.id</li>
+        <li>likes: @photo.likes.summary.total_count (<a href="/fb/@photo.id/likes" target='_blank'>get likes</a>)</li>
         <li>created: @photo.created_time</li>
         <li>updated: @photo.updated_time</li>
         <li>picture: <img src="@photo.picture" /></li>

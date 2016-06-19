@@ -30,5 +30,4 @@ package object services {
       .withQueryString(parameters: _*)
       .get
   }
-
 }

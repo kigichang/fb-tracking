@@ -1,0 +1,68 @@
+@import services.facebook._
+@import org.apache.commons.codec.binary.Base64
+@(posts: Posts)
+<html>
+<head>
+    <meta charset="utf-8" />
+</head>
+<body>
+@for(post <- posts.data) {
+<div style='border-bottom:1px solid #CCC; margin-top:1em'>
+    <ul>
+        @if(post.link.isEmpty) { <li>id: @post.id</li> } else { <li>id: <a href='@post.link.get' target='_blank'>@post.id</a></li>}
+        <li>likes: @post.likes.summary.total_count (<a href='/fb/@post.id/likes' target='_blank'>get likes</a>)</li>
+        <li>created: @post.created_time</li>
+        <li>updated: @post.updated_time</li>
+        <li>type: @(post.`type`.getOrElse("unknown"))</li>
+        @for(objId <- post.object_id) {
+            @if(post.`type`.getOrElse("unknown") == "photo") { <li>object id: <a href='/fb/photo/@objId' target='_blank'>@objId</a></li> } else { <li>object id: @objId</li> }
+        }
+        @for(name <- post.name) { <li>name: @name</li> }
+        @for(msg <- post.message) { <li>message:<div>@Html(org.apache.commons.lang3.StringUtils.replace(msg, "\n", "<br/>"))</div></li> }
+        @for(picture <- post.picture) { <li>picture: <img src='@picture' /></li> }
+        @for(tags <- post.message_tags) {
+        <li>Message Tags: <ul>
+            @for(tag <- tags) {
+            <li><ul>
+                @if(tag.`type`.getOrElse("unknown") == "page") { <li>id: <a href='/fb/@tag.id' target='_blank'>@tag.id</a></li> } else { <li>id: @tag.id</li> }
+                <li>name: @tag.name</li>
+                @for(typ <- tag.`type`) { <li>type: @typ</li> }
+                <li>offset: @tag.offset</li>
+                <li>length@tag.length</li>
+            </ul></li>
+            }
+        </ul></li>
+        }
+        @for(story <- post.story) { <li>Story: @story</li> }
+        @for(tags <- post.story_tags) {
+        <li>Story Tags: <ul>
+            @for(tag <- tags) {
+            <li><ul>
+                @if(tag.`type`.getOrElse("unknown") == "page") { <li>id: <a href='/fb/@tag.id' target='_blank'>@tag.id</a></li> } else { <li>id: <a href='/fb/@tag.id' target='_blank'>@tag.id</a></li> }
+                <li>name: @tag.name</li>
+                @for(typ <- tag.`type`) { <li>type: @typ</li> }
+                <li>offset: @tag.offset</li>
+                <li>length: @tag.length</li>
+            </ul></li>
+            }
+            }
+        </ul></li></ul></div>
+}
+
+@for(paging <- posts.paging) {
+
+@for(next <- paging.next) {
+<br /><a href='/fb/posts/next/@{Base64.encodeBase64URLSafeString(next.getBytes("UTF-8"))}'>next</a>
+}
+
+@for(prev <- paging.previous) {
+<br /><a href='/fb/posts/next/@{Base64.encodeBase64URLSafeString(prev.getBytes("UTF-8"))}'>prev</a>
+}
+
+@for(cursor <- paging.cursors) {
+<br />after: @cursor.after
+<br />before: @cursor.before
+}
+}
+</body>
+</html>

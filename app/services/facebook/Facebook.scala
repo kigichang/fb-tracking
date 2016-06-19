@@ -8,7 +8,6 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.mvc.{AnyContent, Request}
 
 import scala.concurrent.Future
-import scala.concurrent.Await
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.duration.DurationInt
@@ -108,4 +107,13 @@ class Facebook @Inject() (ws: WSClient) {
 
   def photos(id: String): Future[Either[JsError, Photos]] =
     get[Photos](s"$GraphURL/$version/$id/photos?$PhotosFields")
+
+  def photo(id: String): Future[Either[JsError, Photo]] =
+    get[Photo](s"$GraphURL/$version/$id")
+
+  def posts(id: String): Future[Either[JsError, Posts]] =
+    get[Posts](s"$GraphURL/$version/$id/posts?$PostsFields")
+
+  def likes(id: String): Future[Either[JsError, Likes]] =
+    get[Likes](s"$GraphURL/$version/$id/likes?$LikesFields", "summary" -> "true")
 }

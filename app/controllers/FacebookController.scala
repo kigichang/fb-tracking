@@ -77,7 +77,7 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
   }
 
   def photos(id: String) = Action.async {
-    fb.photos(id: String) map {
+    fb.photos(id) map {
       case Right(photos) => Ok(views.html.photos(photos))
       case Left(error) => Ok(error.toString)
     }
@@ -86,6 +86,41 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
   def photosNext(url: String) = Action.async {
     fb.paging[Photos](new String(Base64.decodeBase64(url), "UTF-8")) map {
       case Right(photos) => Ok(views.html.photos(photos))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def photo(id: String) = Action.async {
+    fb.photo(id) map {
+      case Right(photo) => Ok(views.html.photo(photo))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def posts(id: String) = Action.async {
+    fb.posts(id) map {
+      case Right(posts) => Ok(views.html.posts(posts))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def postsNext(url: String) = Action.async {
+    fb.paging[Posts](new String(Base64.decodeBase64(url), "UTF-8")) map {
+      case Right(posts) => Ok(views.html.posts(posts))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def likes(id: String) = Action.async {
+    fb.likes(id) map {
+      case Right(likes) => Ok(views.html.likes(likes))
+      case Left(error) => Ok(error.toString)
+    }
+  }
+
+  def likesNext(url: String) = Action.async {
+    fb.paging[Likes](new String(Base64.decodeBase64(url), "UTF-8")) map {
+      case Right(likes) => Ok(views.html.likes(likes))
       case Left(error) => Ok(error.toString)
     }
   }

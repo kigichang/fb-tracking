@@ -1,0 +1,37 @@
+@import services.facebook._
+@import org.apache.commons.codec.binary.Base64
+@(likes: Likes)
+<html>
+<head>
+    <meta charset="utf-8" /></head>
+<body>
+Likes total: @likes.summary.total_count
+<p>
+<ul>
+    @for(like <- likes.data) {
+    <li>
+        <a href='/fb/user/@like.id' target='_blank'><img src="@like.pic" /></a>
+        <a href='/fb/user/@like.id' target='_blank'>@like.name (@like.id) (@like.profile_type)</a>
+    </li>
+    }
+</ul>
+</p>
+<p>
+    @for(paging <- likes.paging) {
+
+        @for(next <- paging.next) {
+            <br /><a href='/fb/likes/next/@{Base64.encodeBase64URLSafeString(next.getBytes("UTF-8"))}'>next</a>
+        }
+
+        @for(prev <- paging.previous) {
+            <br /><a href='/fb/likes/next/@{Base64.encodeBase64URLSafeString(prev.getBytes("UTF-8"))}'>prev</a>
+        }
+
+        @for(cursor <- paging.cursors) {
+            <br />after: @cursor.after
+        <br />before: @cursor.before
+        }
+    }
+</p>
+</body>
+</html>

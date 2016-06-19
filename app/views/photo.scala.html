@@ -1,0 +1,21 @@
+@import services.facebook._
+@(photo: Photo)
+<html>
+<head></head>
+<body>
+<div style='border:1px solid #CCC; margin-top:1em'>
+    <ul>
+        <li>id: @photo.id</li>
+        <li>created: @photo.created_time</li>
+        <li>updated: @photo.updated_time</li>
+        <li>picture: <img src="@photo.picture" /></li>
+        <li>images:
+            <ul>
+                @for(image <- photo.images) {
+                <li><img src='@image.source' width='@image.width' height='@image.height' /></li>
+                }
+            </ul>
+        </li>
+    </ul></div>
+</body>
+</html>
