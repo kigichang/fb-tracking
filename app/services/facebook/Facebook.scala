@@ -116,4 +116,11 @@ class Facebook @Inject() (ws: WSClient) {
 
   def likes(id: String): Future[Either[JsError, Likes]] =
     get[Likes](s"$GraphURL/$version/$id/likes?$LikesFields", "summary" -> "true")
+
+  def user(id: String): Future[Either[JsError, User]] =
+    get[User](s"$GraphURL/$version/$id?$UserFields")
+
+  def tokenInfo(): Future[WSResponse] = {
+    call(ws, s"$GraphURL/$version/debug_token", "input_token" -> token, "access_token" -> token)
+  }
 }

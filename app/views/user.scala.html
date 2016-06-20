@@ -1,0 +1,17 @@
+@import services.facebook._
+@(user: User)
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@user.name</title>
+</head>
+<body>
+<h4>@user.name</h4>
+<br /><a href='/fb/chrome/@{java.net.URLEncoder.encode(user.link, "UTF-8")}' target='_blank'>@user.name (@user.id)</a>
+<br /><a href='@user.link' target='_blank'>@user.link</a>
+<!-- <br /><a href="/fb/@user.id/albums" target='_blank'>Albums</a>
+<br /><a href="/fb/@user.id/photos" target='_blank'>Photos</a>
+<br /><a href="/fb/@user.id/posts" target='_blank'>Posts</a>  -->
+</body>
+
+</html>

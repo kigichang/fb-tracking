@@ -1,0 +1,31 @@
+@import scala.collection.mutable
+@(user: (String, String), posts: mutable.Buffer[String], friends: mutable.Buffer[(String, String, String)], followers: mutable.Buffer[(String, String, String)])
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@user._1</title>
+</head>
+<body>
+<h1>
+    <img src='@user._2' /> @user._1
+</h1>
+<p>Posts:
+    @for(post <- posts) {
+<div style='border-bottom:1px solid #CCC; margin-top:1em'>@post</div> }
+</p>
+<p>Friends:
+<ul>
+    @for(friend <- friends) {
+    <li><img src='@friend._1' /><a href='/fb/chrome/@{java.net.URLEncoder.encode(friend._2, "UTF-8")}' target='_blank'>@friend._3</a></li>
+    }
+</ul>
+</p>
+<p>Followers:
+<ul>
+    @for(follower <- followers) {
+    <li><img src='@follower._1' /><a href='/fb/chrome/@{java.net.URLEncoder.encode(follower._2, "UTF-8")}' target='_blank'>@follower._3</a></li>
+    }
+</ul>
+</p>
+</body>
+</html>

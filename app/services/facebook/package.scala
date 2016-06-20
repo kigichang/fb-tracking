@@ -155,6 +155,10 @@ package object facebook {
 
   val PostsFields = s"fields=id,caption,created_time,description,from,icon,link,message,message_tags,name,object_id,picture,properties,source,status_type,story,story_tags,type,updated_time,with_tags,likes.limit(0).summary(true)"
 
+  case class User(id: String, name: String, first_name: String, last_name: String, link: String)
+  implicit val userFormat = Json.format[User]
+
+  val UserFields = "fields=id,name,first_name,last_name,link"
 
 
 }
