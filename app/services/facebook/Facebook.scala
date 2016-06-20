@@ -39,7 +39,13 @@ class Facebook @Inject() (ws: WSClient) {
 
   def token = if ("" != longTermAccessToken) longTermAccessToken else accessToken
 
+  /**
+    * 產生 Faceboook oauth url
+    * @param uri 認証完成後，回到那個網址
+    * @return
+    */
   def loginURL(uri: String) = {
+    /* 記錄 redirect uri, 等一下拿 token 時，會用到 */
     redirectURI = uri
     s"https://www.facebook.com/$version/dialog/oauth?client_id=$appId&redirect_uri=$uri"
   }
