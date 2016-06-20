@@ -46,17 +46,13 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
 
   def code(code: String) = Action.async {
 
-    val tt: Future[Option[String]] = for (
+    (for (
       code1 <- fb.getAccessToken(code);
       code2 <- fb.getLongAccessToken()
-    ) yield code2
-
-    tt map { opt => opt match {
+    ) yield code2) map { opt => opt match {
       case Some(ret) => Ok(ret)
       case None => Ok("token error")
-    }
-    }
-
+    }}
   }
 
   def page(name: String) = Action.async {

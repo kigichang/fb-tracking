@@ -24,10 +24,17 @@ package object services {
     case Left(error) => Left(json)
   }*/
 
-  def call(ws: WSClient, url :String, parameters: (String, String)*) = {
+  def get(ws: WSClient, url :String, parameters: (String, String)*) = {
     ws.url(url).withFollowRedirects(true)
       .withRequestTimeout(10 seconds)
       .withQueryString(parameters: _*)
       .get
   }
+
+  def post(ws: WSClient, url: String, parameters: (String, String)*) =
+    ws.url(url)
+      .withFollowRedirects(true)
+      .withRequestTimeout(10 seconds)
+      .post(parameters.groupBy(p => p._1).mapValues(seq => seq.map(v => v._2)))
+
 }

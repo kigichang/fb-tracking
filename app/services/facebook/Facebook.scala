@@ -3,14 +3,11 @@ package services.facebook
 import javax.inject._
 
 import play.api.Logger
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Reads}
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.json.{JsError, Reads}
 import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.mvc.{AnyContent, Request}
 
 import scala.concurrent.Future
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-
-import scala.concurrent.duration.DurationInt
 
 /**
   * Created by kigi on 6/15/16.
@@ -41,6 +38,7 @@ class Facebook @Inject() (ws: WSClient) {
 
   /**
     * 產生 Faceboook oauth url
+    *
     * @param uri 認証完成後，回到那個網址
     * @return
     */
@@ -53,7 +51,7 @@ class Facebook @Inject() (ws: WSClient) {
   def getAccessToken(code: String): Future[Option[String]] = {
     log.debug(s"redirect_uri: $redirectURI")
 
-    val resp: Future[WSResponse] = call(ws, s"$GraphURL/$version/oauth/access_token",
+    val resp: Future[WSResponse] = services.get(ws, s"$GraphURL/$version/oauth/access_token",
       "client_id" -> appId,
       "client_secret" -> secret,
       "redirect_uri" -> redirectURI,
@@ -74,7 +72,7 @@ class Facebook @Inject() (ws: WSClient) {
 
   def getLongAccessToken(): Future[Option[String]] = {
 
-    val resp = call(ws, s"$GraphURL/$version/oauth/access_token",
+    val resp = services.get(ws, s"$GraphURL/$version/oauth/access_token",
       "grant_type" -> "fb_exchange_token",
       "client_id" -> appId,
       "client_secret" -> secret,
@@ -91,7 +89,7 @@ class Facebook @Inject() (ws: WSClient) {
   }
 
   def get0(url: String, parameters: (String, String)*): Future[WSResponse] =
-    call(ws, url, (("access_token", token) +: parameters): _*)
+    services.get(ws, url, (("access_token", token) +: parameters): _*)
 
   def get[T](url: String, parameters: (String, String)*)(implicit rds: Reads[T]): Future[Either[JsError, T]] =
     get0(url, parameters: _*) map { response => validate[T](response.json)(rds) }
@@ -106,7 +104,7 @@ class Facebook @Inject() (ws: WSClient) {
   def albums(id: String): Future[Either[JsError, Albums]] =
     get[Albums](s"$GraphURL/$version/$id/albums?$AlbumsFields")
 
-  def paging[T](url: String)(implicit rds: Reads[T]): Future[Either[JsError, T]] = call(ws, url) map { resp => validate[T](resp.json) }
+  def paging[T](url: String)(implicit rds: Reads[T]): Future[Either[JsError, T]] = get[T](url) //services.get(ws, url) map { resp => validate[T](resp.json) }
 
   //def albumsWithURL(url: String): Future[Either[JsError, Albums]] = paging[Albums](url)
 
@@ -127,6 +125,6 @@ class Facebook @Inject() (ws: WSClient) {
     get[User](s"$GraphURL/$version/$id?$UserFields")
 
   def tokenInfo(): Future[WSResponse] = {
-    call(ws, s"$GraphURL/$version/debug_token", "input_token" -> token, "access_token" -> token)
+    services.get(ws, s"$GraphURL/$version/debug_token", "input_token" -> token, "access_token" -> token)
   }
 }
