@@ -1,49 +1,15 @@
-This is your new Play application
-=================================
+# Facebook Tracking #
 
-This file will be packaged with your application when using `activator dist`.
+利用 Facebook Graph API 來模擬一位已授權的用戶，
+來爬取公開的資訊。
 
-There are several demonstration files available in this template.
 
-Controllers
-===========
+由於 FB 修改隱私權後，已無法直接用 Graph API 取的未授權的用戶基本資料，
+改由用 Selenium 透過瀏覽器取得。
 
-- HomeController.scala:
 
-  Shows how to handle simple HTTP requests.
+執行指定： `run -Dfacebook.appid=FB_APPID -Dfacebook.secret=FB_APP_SECRET -Dfacebook.account=FB_ACCOUNT -Dfacebook.password=FB_PASSWORD -Dinstagram.appid=INSTAGRAM_CLIENT_ID -Dinstagram.secret=INSTAGRAM_CLIENT_SECRET`
 
-- AsyncController.scala:
 
-  Shows how to do asynchronous programming when handling a request.
+Instagram 也因此修改設定，目前無法在開發模式，直接取得用戶資料。
 
-- CountController.scala:
-
-  Shows how to inject a component into a controller and use the component when
-  handling requests.
-
-Components
-==========
-
-- Module.scala:
-
-  Shows how to use Guice to bind all the components needed by your application.
-
-- Counter.scala:
-
-  An example of a component that contains state, in this case a simple counter.
-
-- ApplicationTimer.scala:
-
-  An example of a component that starts when the application starts and stops
-  when the application stops.
-
-Filters
-=======
-
-- Filters.scala:
-
-  Creates the list of HTTP filters used by your application.
-
-- ExampleFilter.scala
-
-  A simple filter that adds a header to every response.
