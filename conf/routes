@@ -33,6 +33,8 @@ GET /fb/chrome/:url                 controllers.FacebookController.chrome(url: S
 # Instagram API
 GET /ig/auth                        controllers.InstagramController.auth
 GET /gram                           controllers.InstagramController.gram(code: String)
+GET /ig/search                      controllers.InstagramController.search(q: String)
+GET /ig/:id                         controllers.InstagramController.user(id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

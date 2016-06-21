@@ -25,4 +25,13 @@ class InstagramController @Inject() (ig: Instagram) extends Controller {
       case None => Ok("token error")
     }
   }
+
+
+  def search(q: String) = Action.async {
+    ig.search(q).map(result => Ok(result.toString))
+  }
+
+  def user(id: String) = Action.async {
+    ig.user(id) map { result => Ok(result.toString) }
+  }
 }

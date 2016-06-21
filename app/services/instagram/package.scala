@@ -9,11 +9,18 @@ package object instagram {
 
   val ApiURL = "https://api.instagram.com"
 
+  case class InstagramError(error: String)
 
   /* JSON Start*/
 
   case class Meta(code: Int, error_type: Option[String], error_message: Option[String])
   implicit val metaFormat = Json.format[Meta]
+
+  trait InstagramResult[T] {
+    val meta: Meta
+    val data: Option[T]
+  }
+
 
   case class Pagination(next_url: String, next_max_id: String)
   implicit val paginationFormat = Json.format[Pagination]
@@ -37,10 +44,12 @@ package object instagram {
   implicit val tokenFormat = Json.format[Token]
 
 
-  case class UserResult(meta: Meta, data: User)
+  case class UserResult(override val meta: Meta, override val data: Option[User]) extends InstagramResult[User]
   implicit val userResultFormat = Json.format[UserResult]
 
 
+  case class SearchResult(override val meta: Meta, override val data: Option[Seq[User]]) extends InstagramResult[Seq[User]]
+  implicit val searchResultFormat = Json.format[SearchResult]
 
   /* JSON End*/
 
