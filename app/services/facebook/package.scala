@@ -14,12 +14,21 @@ package object facebook {
 
   /* JSON Definition Start */
 
+  /**
+    * User Access Token
+    */
   case class Token(access_token: String, token_type: String, expires_in: Int)
   implicit val tokenFormat = Json.format[Token]
 
+  /**
+    * Error Detail Message
+    */
   case class ErrorDetail(message: String, `type`: String, code: Int, fbtrace_id: Option[String])
   implicit val errorDetailFormat = Json.format[ErrorDetail]
 
+  /**
+    * Error Message
+    */
   case class Error(error: ErrorDetail)
   implicit val errorFormat = Json.format[Error]
 
@@ -43,7 +52,6 @@ package object facebook {
   case class Likes(data: Seq[Like], paging: Option[Paging], summary: Summary)
   implicit val likesFormat = Json.format[Likes]
   val LikesFields = "fields=id,name,link,pic,pic_large,pic_crop,pic_small,pic_square,profile_type,username"
-
 
   case class Cover(id: String,
                    cover_id: String,

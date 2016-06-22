@@ -88,11 +88,8 @@ class Facebook @Inject() (ws: WSClient) {
     }
   }
 
-  def get0(url: String, parameters: (String, String)*): Future[WSResponse] =
-    services.get(ws, url, (("access_token", token) +: parameters): _*)
-
   def get[T](url: String, parameters: (String, String)*)(implicit rds: Reads[T]): Future[Either[JsError, T]] =
-    get0(url, parameters: _*) map { response => validate[T](response.json)(rds) }
+    services.get(ws, url, (("access_token", token) +: parameters): _*) map { response => validate[T](response.json)(rds) }
 
 
   def page(id: String): Future[Either[JsError, Page]] = get[Page](s"$GraphURL/$version/$id?$PageFields")
@@ -104,10 +101,7 @@ class Facebook @Inject() (ws: WSClient) {
   def albums(id: String): Future[Either[JsError, Albums]] =
     get[Albums](s"$GraphURL/$version/$id/albums?$AlbumsFields")
 
-  def paging[T](url: String)(implicit rds: Reads[T]): Future[Either[JsError, T]] = get[T](url) //services.get(ws, url) map { resp => validate[T](resp.json) }
-
-  //def albumsWithURL(url: String): Future[Either[JsError, Albums]] = paging[Albums](url)
-
+  def paging[T](url: String)(implicit rds: Reads[T]): Future[Either[JsError, T]] = get[T](url)
 
   def photos(id: String): Future[Either[JsError, Photos]] =
     get[Photos](s"$GraphURL/$version/$id/photos?$PhotosFields")
