@@ -24,8 +24,8 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
 
   val log = Logger("FacebookController")
 
+  /* login facebook user */
   web.get("https://www.facebook.com")
-
   web.findElement(By.id("email")).sendKeys(config.getString("facebook.account"))
   web.findElement(By.id("pass")).sendKeys(config.getString("facebook.password"))
   web.findElement(By.id("pass")).submit()
