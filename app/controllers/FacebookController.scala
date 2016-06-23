@@ -31,8 +31,12 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
   web.findElement(By.id("pass")).submit()
 
 
-  def input() = Action {
-    Ok(views.html.input())
+  def input(name: Option[String]) = Action {
+    name match {
+      case Some(n) => Redirect(routes.FacebookController.page(n))
+      case None => Ok(views.html.input())
+    }
+
   }
 
   def dialog() = Action {
