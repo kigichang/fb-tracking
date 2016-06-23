@@ -172,7 +172,7 @@ class Facebook @Inject() (ws: WSClient) {
     * 取得 facebook 單張相片
     */
   def photo(id: String): Future[Either[JsError, Photo]] =
-    query[Photo](s"$GraphURL/$version/$id")
+    query[Photo](s"$GraphURL/$version/$id?$PhotoFields")
 
   /**
     * 取得 facebook 動態
@@ -194,7 +194,7 @@ class Facebook @Inject() (ws: WSClient) {
 
   /**
     * current token information
- *
+    *
     * @return
     */
   def tokenInfo(): Future[WSResponse] = {

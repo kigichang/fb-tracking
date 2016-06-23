@@ -125,6 +125,8 @@ package object facebook {
                    likes: Likes)
   implicit val photoFormat = Json.format[Photo]
 
+  val PhotoFields = "fields=created_time,height,icon,images,link,picture,updated_time,width,likes.limit(0).summary(true)"
+
   case class Photos(data: Seq[Photo], paging: Option[Paging])
   implicit val photosFormat = Json.format[Photos]
 
