@@ -43,12 +43,14 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
     Redirect(url)
   }
 
-
+  /**
+    * 取得 long-term user access token
+    */
   def code(code: String) = Action.async {
 
     (for (
-      code1 <- fb.getAccessToken(code);
-      code2 <- fb.getLongAccessToken()
+      code1 <- fb.getAccessToken(code); /* 取得 user access token */
+      code2 <- fb.getLongAccessToken()  /* 轉成 long-term user access token */
     ) yield code2) map { opt => opt match {
       case Some(ret) => Ok(ret)
       case None => Ok("token error")
@@ -136,7 +138,11 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
     fb.tokenInfo() map { resp => Ok(resp.json) }
   }
 
-
+  /**
+    * 利用 Chrome Browser 取得個人圖片、 po 文，好友、追隨者清單
+    * @param url
+    * @return
+    */
   def chrome(url: String) = Action {
     val crawl: Try[((String, String), mutable.Buffer[String], mutable.Buffer[(String, String, String)], mutable.Buffer[(String, String, String)])] = Try {
 
@@ -173,9 +179,7 @@ class FacebookController @Inject() (fb: Facebook, web: WebDriver) extends Contro
     }
 
     if(crawl.isSuccess) Ok(views.html.friends(crawl.get._1, crawl.get._2, crawl.get._3, crawl.get._4))
-    else {
-      crawl.failed.get.printStackTrace
-      Ok(crawl.failed.get.toString)
-    }
+    else Ok(crawl.failed.get.toString)
+
   }
 }

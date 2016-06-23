@@ -137,66 +137,67 @@ class Facebook @Inject() (ws: WSClient) {
     }
   }
 
-  def get[T](url: String, parameters: (String, String)*)(implicit rds: Reads[T]): Future[Either[JsError, T]] =
-    services.get(ws, url, (("access_token", token) +: parameters): _*) map { response => validate[T](response.json)(rds) }
+  def query[T](url: String, parameters: (String, String)*)(implicit rds: Reads[T]): Future[Either[JsError, T]] =
+    get(ws, url, (("access_token", token) +: parameters): _*) map { response => validate[T](response.json)(rds) }
 
   /**
     * 取得 facebook 粉絲頁
     */
-  def page(id: String): Future[Either[JsError, Page]] = get[Page](s"$GraphURL/$version/$id?$PageFields")
+  def page(id: String): Future[Either[JsError, Page]] = query[Page](s"$GraphURL/$version/$id?$PageFields")
 
   /**
     * 取得 facebook 用戶或粉絲頁頭像資料
     */
   def picture(id: String): Future[Either[JsError, Picture]] =
-    get[Picture](s"$GraphURL/$version/$id/picture", "redirect" -> "false", "type" -> "large")
+    query[Picture](s"$GraphURL/$version/$id/picture", "redirect" -> "false", "type" -> "large")
 
   /**
     * 取得 facebook 相簿
     */
   def albums(id: String): Future[Either[JsError, Albums]] =
-    get[Albums](s"$GraphURL/$version/$id/albums?$AlbumsFields")
+    query[Albums](s"$GraphURL/$version/$id/albums?$AlbumsFields")
 
   /**
     * Facebook Node 分頁資料
     */
-  def paging[T](url: String)(implicit rds: Reads[T]): Future[Either[JsError, T]] = get[T](url)
+  def paging[T](url: String)(implicit rds: Reads[T]): Future[Either[JsError, T]] = query[T](url)
 
   /**
     * 取得 facebook 相片
     */
   def photos(id: String): Future[Either[JsError, Photos]] =
-    get[Photos](s"$GraphURL/$version/$id/photos?$PhotosFields")
+    query[Photos](s"$GraphURL/$version/$id/photos?$PhotosFields")
 
   /**
     * 取得 facebook 單張相片
     */
   def photo(id: String): Future[Either[JsError, Photo]] =
-    get[Photo](s"$GraphURL/$version/$id")
+    query[Photo](s"$GraphURL/$version/$id")
 
   /**
     * 取得 facebook 動態
     */
   def posts(id: String): Future[Either[JsError, Posts]] =
-    get[Posts](s"$GraphURL/$version/$id/posts?$PostsFields")
+    query[Posts](s"$GraphURL/$version/$id/posts?$PostsFields")
 
   /**
     * 取得 facebook 按讚
     */
   def likes(id: String): Future[Either[JsError, Likes]] =
-    get[Likes](s"$GraphURL/$version/$id/likes?$LikesFields", "summary" -> "true")
+    query[Likes](s"$GraphURL/$version/$id/likes?$LikesFields", "summary" -> "true")
 
   /**
     * 取得 facebook 用戶資料
     */
   def user(id: String): Future[Either[JsError, User]] =
-    get[User](s"$GraphURL/$version/$id?$UserFields")
+    query[User](s"$GraphURL/$version/$id?$UserFields")
 
   /**
     * current token information
+ *
     * @return
     */
   def tokenInfo(): Future[WSResponse] = {
-    services.get(ws, s"$GraphURL/$version/debug_token", "input_token" -> token, "access_token" -> token)
+    get(ws, s"$GraphURL/$version/debug_token", "input_token" -> token, "access_token" -> token)
   }
 }
