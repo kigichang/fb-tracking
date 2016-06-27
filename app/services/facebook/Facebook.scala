@@ -147,6 +147,9 @@ class Facebook @Inject() (ws: WSClient) {
 
   /**
     * 取得 facebook 用戶或粉絲頁頭像資料
+    * 記得要加 redirect = false，
+    * 否則 Facebook 會直接回覆圖檔
+    *
     */
   def picture(id: String): Future[Either[JsError, Picture]] =
     query[Picture](s"$GraphURL/$version/$id/picture", "redirect" -> "false", "type" -> "large")
@@ -182,6 +185,7 @@ class Facebook @Inject() (ws: WSClient) {
 
   /**
     * 取得 facebook 按讚
+    * 加 summary = true, 可拿到總按讚數
     */
   def likes(id: String): Future[Either[JsError, Likes]] =
     query[Likes](s"$GraphURL/$version/$id/likes?$LikesFields", "summary" -> "true")
